@@ -1,7 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
 from openpyxl import Workbook
-import pandas as pd
 
 from typing import List, Dict
 
