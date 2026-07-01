@@ -70,6 +70,7 @@ def main() -> None:
     # Сохранение данных в файл itmo.xlsx
     workbook = Workbook()
     save_to_excel(general_Students, "Общий конкурс", workbook, first=True)
+    save_to_excel(target_Students, "Целевая квота", workbook)
     save_to_excel(unusual_Students, "Особая квота", workbook)
     save_to_excel(special_Students, "Отдельная квота", workbook)
     save_to_excel(WET_Students, "БВИ", workbook)
