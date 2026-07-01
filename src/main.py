@@ -7,7 +7,8 @@ from typing import List, Dict
 
 from ORM import Student
 
-URL = "https://abit.itmo.ru/_next/data/2gVOXLiouyaB4bhDUzQw8/ru/rating/bachelor/budget/2342.json?degree=bachelor&financing=budget&id=2342"
+programmNumber = 2342 # Номер направления (указывается в ссылке самого направления)
+URL = f"https://abit.itmo.ru/_next/data/2gVOXLiouyaB4bhDUzQw8/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
 
 def parseStudents(quote: Dict, category: str) -> List[Student]:
     """Функция для парсинга данных студентов по категориям"""
@@ -73,7 +74,7 @@ def main() -> None:
     save_to_excel(special_Students, "Отдельная квота", workbook)
     save_to_excel(WET_Students, "БВИ", workbook)
 
-    workbook.save("ИТМО.Программная инженерия.xlsx")
+    workbook.save("ИТМО.Программная инженерия.xlsx") # Название таблицы
 
 if __name__ == "__main__":
     main()
