@@ -9,7 +9,8 @@ from codes import programs
 code = input("Введите номер программы: ")
 
 programmNumber = programs[code] # Номер направления (указывается в ссылке самого направления)
-URL = f"https://abit.itmo.ru/_next/data/2gVOXLiouyaB4bhDUzQw8/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
+strangePart = "6-fP7bINWbMuWwRnL40BF"
+URL = f"https://abit.itmo.ru/_next/data/{strangePart}/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
 
 def parseStudents(quote: Dict, category: str) -> List[Student]:
     """Функция для парсинга данных студентов по категориям"""
