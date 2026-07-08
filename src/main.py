@@ -7,27 +7,14 @@ from typing import List, Dict
 from ORM import Student
 from quoteEnum import Quote
 from codes import programs
+from service import getQuote
 
 code: str = input("Введите номер программы: ")
 
 programmNumber = programs[code]        # Номер направления (указывается в ссылке самого направления)
 strangePart = "6-fP7bINWbMuWwRnL40BF"  # Какой-то странный фрагмент api-запроса, который непонятно откуда доставать
+
 URL: str = f"https://abit.itmo.ru/_next/data/{strangePart}/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
-
-def get_quote(quote: Quote) -> Dict:
-    """Функция для получения данных студентов из API сайта"""
-    responce: Response = requests.get(url=URL)
-    result = responce.json()
-    
-    pageProps = result['pageProps']
-    programList = pageProps["programList"] # Все студенты во всех квотах
-
-    match quote:
-        case Quote.BUDGET:  return programList["general_competition"] # Общий конкурс
-        case Quote.SPECIAL: return programList["by_special_quota"]    # Отдельная квота
-        case Quote.TARGET:  return programList["by_target_quota"]     # Целевое обучение
-        case Quote.WET:     return programList["without_entry_tests"] # БВИ
-        case Quote.UNUSUAL: return programList["by_unusual_quota"]    # Особая квота
 
 def parseStudents(quote: Dict, category: str) -> List[Student]:
     """Функция для парсинга данных студентов по категориям"""
@@ -67,11 +54,11 @@ def save_to_excel(students: List[Student], listName: str, workbook: Workbook, fi
 
 def main() -> None:
     # Распределение студентам по квотам
-    WET:     dict = get_quote(Quote.WET)        # БВИ
-    unusual: dict = get_quote(Quote.UNUSUAL)    # Особая квота
-    special: dict = get_quote(Quote.SPECIAL)    # Отдельная квота
-    target:  dict = get_quote(Quote.TARGET)     # Целевое обучение
-    general: dict = get_quote(Quote.BUDGET)     # Общий конкурс
+    WET:     dict = getQuote(URL, Quote.WET)        # БВИ
+    unusual: dict = getQuote(URL, Quote.UNUSUAL)    # Особая квота
+    special: dict = getQuote(URL, Quote.SPECIAL)    # Отдельная квота
+    target:  dict = getQuote(URL, Quote.TARGET)     # Целевое обучение
+    general: dict = getQuote(URL, Quote.BUDGET)     # Общий конкурс
     
     # Массивы с студентами
     WET_Students:     list[Student] = parseStudents(WET, "БВИ")
