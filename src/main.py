@@ -1,20 +1,37 @@
 import requests
+from requests import Response
 from openpyxl import Workbook
 
 from typing import List, Dict
 
 from ORM import Student
+from quoteEnum import Quote
 from codes import programs
 
-code = input("Введите номер программы: ")
+code: str = input("Введите номер программы: ")
 
 programmNumber = programs[code]        # Номер направления (указывается в ссылке самого направления)
 strangePart = "6-fP7bINWbMuWwRnL40BF"  # Какой-то странный фрагмент api-запроса, который непонятно откуда доставать
-URL = f"https://abit.itmo.ru/_next/data/{strangePart}/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
+URL: str = f"https://abit.itmo.ru/_next/data/{strangePart}/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
+
+def get_quote(quote: Quote) -> Dict:
+    """Функция для получения данных студентов из API сайта"""
+    responce: Response = requests.get(url=URL)
+    result = responce.json()
+    
+    pageProps = result['pageProps']
+    programList = pageProps["programList"] # Все студенты во всех квотах
+
+    match quote:
+        case Quote.BUDGET:  return programList["general_competition"] # Общий конкурс
+        case Quote.SPECIAL: return programList["by_special_quota"]    # Отдельная квота
+        case Quote.TARGET:  return programList["by_target_quota"]     # Целевое обучение
+        case Quote.WET:     return programList["without_entry_tests"] # БВИ
+        case Quote.UNUSUAL: return programList["by_unusual_quota"]    # Особая квота
 
 def parseStudents(quote: Dict, category: str) -> List[Student]:
     """Функция для парсинга данных студентов по категориям"""
-    students = list()
+    students: list = list()
     for student in quote:
         id = student["sspvo_id"]
         disciplines_scores = student["disciplines_scores"]
@@ -49,27 +66,21 @@ def save_to_excel(students: List[Student], listName: str, workbook: Workbook, fi
         ])
 
 def main() -> None:
-    responce = requests.get(url=URL)
-    result = responce.json()
-    
-    pageProps = result['pageProps']
-    programList = pageProps["programList"] # Все студенты во всех квотах
-
     # Распределение студентам по квотам
-    WET = programList["without_entry_tests"]     # БВИ
-    unusual = programList["by_unusual_quota"]    # Особая квота
-    special = programList["by_special_quota"]    # Отдельная квота
-    target = programList["by_target_quota"]      # Целевое обучение
-    general = programList["general_competition"] # Общий конкурс
+    WET:     dict = get_quote(Quote.WET)        # БВИ
+    unusual: dict = get_quote(Quote.UNUSUAL)    # Особая квота
+    special: dict = get_quote(Quote.SPECIAL)    # Отдельная квота
+    target:  dict = get_quote(Quote.TARGET)     # Целевое обучение
+    general: dict = get_quote(Quote.BUDGET)     # Общий конкурс
     
     # Массивы с студентами
-    WET_Students = parseStudents(WET, "БВИ")
-    unusual_Students = parseStudents(unusual, "Особая квота")
-    special_Students = parseStudents(special, "Отдельная квота")
-    target_Students = parseStudents(target, "Целевая квота")
-    general_Students = parseStudents(general, "Общий конкурс")
+    WET_Students:     list[Student] = parseStudents(WET, "БВИ")
+    unusual_Students: list[Student] = parseStudents(unusual, "Особая квота")
+    special_Students: list[Student] = parseStudents(special, "Отдельная квота")
+    target_Students:  list[Student] = parseStudents(target, "Целевая квота")
+    general_Students: list[Student] = parseStudents(general, "Общий конкурс")
     
-    # Сохранение данных в файл itmo.xlsx
+    # Сохранение данных в файл .xlsx
     workbook = Workbook()
     save_to_excel(general_Students, "Общий конкурс", workbook, first=True)
     save_to_excel(target_Students, "Целевая квота", workbook)
