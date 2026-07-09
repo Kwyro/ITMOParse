@@ -4,7 +4,6 @@ import requests
 
 from ORM import Student
 from quoteEnum import Quote
-from main import parseStudents
 
 def getStudentList(quote: Quote) -> List[Student]:
     ...
@@ -23,3 +22,19 @@ def getQuote(URL: str, quote: Quote) -> Dict:
         case Quote.TARGET:  return programList["by_target_quota"]     # Целевое обучение
         case Quote.WET:     return programList["without_entry_tests"] # БВИ
         case Quote.UNUSUAL: return programList["by_unusual_quota"]    # Особая квота
+
+def parseStudents(quote: Dict, category: str) -> List[Student]:
+    """Функция для парсинга данных студентов по категориям"""
+    students: list = list()
+    for student in quote:
+        id = student["sspvo_id"]
+        disciplines_scores = student["disciplines_scores"]
+        priority = student["priority"]
+        ia_scores = student["ia_scores"]
+        total_scores = student["total_scores"]
+        agreement = student["is_send_agreement"]
+        
+        student = Student(id, disciplines_scores, priority, ia_scores, total_scores, agreement)
+        students.append(student)
+    
+    return students

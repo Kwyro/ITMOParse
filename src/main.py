@@ -7,7 +7,7 @@ from typing import List, Dict
 from ORM import Student
 from quoteEnum import Quote
 from codes import programs
-from service import getQuote
+from service import getQuote, parseStudents
 
 code: str = input("Введите номер программы: ")
 
@@ -15,22 +15,6 @@ programmNumber = programs[code]        # Номер направления (ук
 strangePart = "6-fP7bINWbMuWwRnL40BF"  # Какой-то странный фрагмент api-запроса, который непонятно откуда доставать
 
 URL: str = f"https://abit.itmo.ru/_next/data/{strangePart}/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
-
-def parseStudents(quote: Dict, category: str) -> List[Student]:
-    """Функция для парсинга данных студентов по категориям"""
-    students: list = list()
-    for student in quote:
-        id = student["sspvo_id"]
-        disciplines_scores = student["disciplines_scores"]
-        priority = student["priority"]
-        ia_scores = student["ia_scores"]
-        total_scores = student["total_scores"]
-        agreement = student["is_send_agreement"]
-        
-        student = Student(id, disciplines_scores, priority, ia_scores, total_scores, agreement)
-        students.append(student)
-    
-    return students
 
 def save_to_excel(students: List[Student], listName: str, workbook: Workbook, first: bool = False) -> None:
     if first:
