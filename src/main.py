@@ -12,7 +12,7 @@ from service import getQuote, parseStudents
 code: str = input("Введите номер программы: ")
 
 programmNumber = programs[code]        # Номер направления (указывается в ссылке самого направления)
-strangePart = "YtZroTHbw-TByDqFwY3fe"  # Какой-то странный фрагмент api-запроса, который непонятно откуда доставать
+strangePart = "cn2ZfimbxDMtFK68iLwRt"  # Какой-то странный фрагмент api-запроса, который непонятно откуда доставать
 
 URL: str = f"https://abit.itmo.ru/_next/data/{strangePart}/ru/rating/bachelor/budget/{programmNumber}.json?degree=bachelor&financing=budget&id={programmNumber}"
 
